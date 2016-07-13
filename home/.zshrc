@@ -41,6 +41,11 @@ alias ls='ls --color=auto'
 alias cp='cp --reflink=auto'
 
 # Load antigen.
+if [ ! -e ~/.homesick/repos/antigen/antigen.zsh ]
+then
+  # We need to clone antigen.
+  git clone https://github.com/zsh-users/antigen.git ~/.homesick/repos/antigen
+fi
 source ~/.homesick/repos/antigen/antigen.zsh
 
 # Load antigen stuff.
