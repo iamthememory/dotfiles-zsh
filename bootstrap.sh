@@ -6,7 +6,7 @@
 
 if command -v chsh >/dev/null 2>&1
 then
-  zsh="$(chsh --list-shells | grep 'zsh$' | head -n 1)"
+  zsh="$(cat /etc/shells | grep 'zsh$' | head -n 1)"
 
   if [ "$zsh" != "" ]
   then
