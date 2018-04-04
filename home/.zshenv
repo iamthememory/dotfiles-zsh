@@ -3,6 +3,12 @@
 # to a TTY.
 
 
+# Save pretty much all command history.
+export EXTENDED_HISTORY=1
+export HISTSIZE=1000000
+export SAVEHIST=1000000
+export SHARE_HISTORY=1
+
 # Always dump core.
 ulimit -c unlimited
 
@@ -12,18 +18,15 @@ mkdir -p "${HOME}/"{perl5,texmf} >/dev/null 2>&1
 
 # Environment variables.
 
+QT_SELECT=5
+export QT_SELECT
+
 
 # Use vim as the default editor.
 if command -v vim >/dev/null 2>&1
 then
   export EDITOR="$(which vim)"
 fi
-
-# Save pretty much all command history.
-export EXTENDED_HISTORY=1
-export HISTSIZE=1000000
-export SAVEHIST=1000000
-export SHARE_HISTORY=1
 
 # Use color in less.
 export LESSCOLOR="yes"
@@ -48,7 +51,7 @@ fi
 export TEXMFHOME="${HOME}/texmf"
 
 # Use 32-bit wine.
-export WINEARCH="win32"
+#export WINEARCH="win32"
 
 # Use i3 as the window manager (if it exists).
 #if [ -e "/etc/X11/Sessions/i3wm" ]
@@ -76,6 +79,7 @@ fi
 
 # Tie arrays to the PATH-like, colon-separated variables.
 typeset -T CLASSPATH classpath
+typeset -T GEM_PATH gem_path
 typeset -T GOPATH gopath
 typeset -T LS_COLORS ls_colors
 typeset -T PERL5LIB perl5lib
@@ -130,8 +134,9 @@ path=("${HOME}/perl5/bin" "$path[@]")
 # Add any ruby gems to the PATH.
 if command -v ruby >/dev/null 2>&1
 then
+  GEM_PATH="$(unset GEM_PATH; unset GEM_HOME; gem env gempath)${GEM_PATH:+:${GEM_PATH}}"
   export GEM_HOME="$(ruby -e 'print Gem.user_dir')"
-  export GEM_PATH="${GEM_HOME}"
+  gem_path+=("${GEM_HOME}")
   path=("$(ruby -e 'print Gem.bindir')" "$path[@]")
 fi
 
@@ -148,6 +153,12 @@ done
 if [ -d "/usr/share/fslint/fslint" ]
 then
   path+=("/usr/share/fslint/fslint")
+fi
+
+# Ccache
+if [ -d "/usr/lib/ccache/bin" ]
+then
+  path=("/usr/lib/ccache/bin" "$path[@]")
 fi
 
 
@@ -178,12 +189,26 @@ perl_local_lib_root=("${HOME}/perl5" "$perl_local_lib_root[@]")
 
 # Force the variables tied to arrays to have unique elements.
 typeset -U classpath
+typeset -U gem_path
 typeset -U gopath
 typeset -U ls_colors
 typeset -U manpath
 typeset -U path
 typeset -U perl5lib
 typeset -U perl_local_lib_root
+
+export GEM_PATH
+export PERL5LIB
+
+# CCache location
+if [ -d "/var/cache/ccache/${USER}" ]
+then
+  export CCACHE_DIR="/var/cache/ccache/${USER}"
+fi
+export USE_CCACHE=1
+export ANDROID_JACK_VM_ARGS="-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx4G"
+
+export R_LIBS_USER="${HOME}/.rlibs/x86_64-pc-linux-gnu-library/3.4"
 
 # Load a local configuration, if one exists.
 if [ -e "$HOME/.zshenv.local" ]

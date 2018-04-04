@@ -15,15 +15,16 @@ fi
 
 # Load homeshick.
 source "$HOME/.homesick/repos/homeshick/homeshick.sh"
-fpath=("$HOME/.homesick/repos/homeshick/completions" $fpath)
+fpath=("$HOME/.local/share/zsh/site-functions" /usr/share/zsh/site-functions "$HOME/.homesick/repos/homeshick/completions" $fpath)
 
 # Update homeshick dotfiles.
 homeshick refresh 2
 
 # Load the completion scripts.
-autoload -U compinit promptinit
+autoload -U compinit promptinit bashcompinit
 compinit
 promptinit
+bashcompinit
 zstyle ':completion::complete:*' use-cache 1
 setopt correctall
 setopt autocd
@@ -48,6 +49,9 @@ then
 fi
 source ~/.homesick/repos/antigen/antigen.zsh
 
+export NVM_AUTO_USE=true
+export NVM_LAZY_LOAD=true
+
 # Load antigen stuff.
 antigen use oh-my-zsh
 antigen bundle command-not-found
@@ -64,9 +68,9 @@ antigen bundle taskwarrior
 antigen bundle web-search
 antigen bundle zsh-users/zsh-syntax-highlighting
 antigen bundle nojhan/liquidprompt
+antigen bundle lukechilds/zsh-nvm
+antigen bundle lukechilds/zsh-better-npm-completion
 antigen apply
-
-# Automatically read the ansible vault password.
 
 unsetopt autopushd
 
@@ -75,6 +79,10 @@ export EXTENDED_HISTORY=1
 export HISTSIZE=1000000
 export SAVEHIST=1000000
 export SHARE_HISTORY=1
+
+# Change CTRL-U to clear the line before the cursor, not the entire line.
+# This is more consistent with shells like bash.
+bindkey '^U' backward-kill-line
 
 # Load a local configuration, if one exists.
 if [ -e "$HOME/.zshrc.local" ]
